@@ -1,5 +1,5 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import axios from 'axios';
+import { fetchImg } from './fetchPicture';
 
 const ref = {
     form: document.querySelector('.search-form'),
@@ -9,21 +9,7 @@ const ref = {
     hideButton: document.querySelector('.load__more'),
     loader: document.getElementById('loading'),
 };
-
-const baseUrl = 'https://pixabay.com/api/?';
-async function fetchImg(content, page) {
-    const searchParams = new URLSearchParams({
-        key: '32614243-5c13f08404019c5c5c85a7837',
-        q: content,
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: true,
-        per_page: 40,
-        page: page,
-    });
-    return axios.get(`${baseUrl}${searchParams}`);
-}
-
+// __________________________________________
 
 function renderImg(ref, data) {
     const markup = data.map(el => {
@@ -54,11 +40,9 @@ function renderImg(ref, data) {
 
     ref.gallery.insertAdjacentHTML('beforeend', markup);
 }
-
-
+// __________________________________________________________
 let page = 1;
 let textContent = '';
-
 const observer = new IntersectionObserver(
     callbackObserver,
     getOptionObserver()
@@ -85,9 +69,11 @@ async function fetchAndRenderImg(e) {
             return Notify.warning(
                 'Sorry, there are no images matching your search query. Please try again.'
             );
+        } else {
+            Notify.success(`Hooray! We found ${image.data.totalHits} images.`);
         }
-
         renderImg(ref, data);
+
         ref.loader.style.display = 'block';
     } catch (error) {
         console.log(error);
@@ -108,7 +94,7 @@ async function onLoadMore() {
 
         renderImg(ref, data);
         smoothScroll();
-        galleryBox.refresh();
+
 
         if (page > totalPages) {
             ref.loader.style.display = 'none';
