@@ -134,4 +134,4 @@ function callbackObserver(entries, observer) {
         }
     });
 }
-observer.observe(ref.loader);
+// observer.observe(ref.loader);
