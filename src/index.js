@@ -1,6 +1,7 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { fetchImg } from './fetchPicture';
 
+
 const ref = {
     form: document.querySelector('.search-form'),
     input: document.querySelector('input'),
@@ -9,7 +10,7 @@ const ref = {
     hideButton: document.querySelector('.load__more'),
     loader: document.getElementById('loading'),
 };
-// __________________________________________
+
 
 function renderImg(ref, data) {
     const markup = data.map(el => {
@@ -40,7 +41,7 @@ function renderImg(ref, data) {
 
     ref.gallery.insertAdjacentHTML('beforeend', markup);
 }
-// __________________________________________________________
+
 let page = 1;
 let textContent = '';
 const observer = new IntersectionObserver(
@@ -73,8 +74,14 @@ async function fetchAndRenderImg(e) {
             Notify.success(`Hooray! We found ${image.data.totalHits} images.`);
         }
 
-        renderImg(ref, data);
+        if (data.length < 40) {
+            Notify.warning(
+                "We're sorry, but you've reached the end of search results."
+            );
+        }
 
+
+        renderImg(ref, data);
         ref.loader.style.display = 'block';
     } catch (error) {
         console.log(error);
@@ -83,11 +90,6 @@ async function fetchAndRenderImg(e) {
 
 async function onLoadMore() {
     page += 1;
-
-    if (page > totalPages) {
-        page = 1;
-        ref.loader.style.display = 'none';
-    }
 
     if (textContent === '') {
         ref.loader.style.display = 'none';
@@ -100,6 +102,13 @@ async function onLoadMore() {
 
         renderImg(ref, data);
         smoothScroll();
+
+        if (page > totalPages) {
+            ref.loader.style.display = 'none';
+            Notify.failure(
+                "We're sorry, but you've reached the end of search results."
+            );
+        }
 
     } catch (error) {
         console.log(error);
@@ -134,4 +143,4 @@ function callbackObserver(entries, observer) {
         }
     });
 }
-// observer.observe(ref.loader);
+
